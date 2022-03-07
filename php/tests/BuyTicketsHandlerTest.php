@@ -30,7 +30,7 @@ final class BuyTicketsHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_should_allow_to_reserve_the_only_ticket_available_if_it_wasnt_sold_yet()
+    public function it_will_allow_to_reserve_the_only_ticket_available_if_it_wasnt_sold_yet()
     {
         $concertId = 'concert-123';
         $customerId = 'customer-1';
@@ -43,7 +43,7 @@ final class BuyTicketsHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_should_disallow_ticket_sales_when_the_concert_doesnt_have_initial_capacity()
+    public function it_will_disallow_ticket_sales_when_the_concert_doesnt_have_initial_capacity()
     {
         $concertId = 'concert-123';
         $customerId = 'customer-1';
@@ -56,7 +56,7 @@ final class BuyTicketsHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_should_disallow_ticket_sales_for_more_than_the_capacity()
+    public function it_will_disallow_ticket_sales_for_more_than_the_capacity()
     {
         $concertId = 'concert-123';
         $customerId = 'customer-1';
@@ -69,7 +69,7 @@ final class BuyTicketsHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_should_take_already_sold_tickets_into_account()
+    public function it_will_take_already_sold_tickets_into_account()
     {
         $concertId = 'concert-123';
         $customerId = 'customer-1';
