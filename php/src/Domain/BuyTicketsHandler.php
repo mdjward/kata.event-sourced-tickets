@@ -7,7 +7,7 @@ use Aardling\Concerts\Infrastructure\EventStore;
 /**
  * FYI : I'm breaking my own rule about not naming a class according to its function
  */
-class BuyTicketsHandler
+final class BuyTicketsHandler
 {
     private EventStore $eventStore;
 

@@ -4,7 +4,7 @@ namespace Aardling\Concerts\Domain;
 
 use Aardling\Concerts\DomainEvent;
 
-class SalesForConcert
+final class SalesForConcert
 {
     /**
      * @param DomainEvent[] $events

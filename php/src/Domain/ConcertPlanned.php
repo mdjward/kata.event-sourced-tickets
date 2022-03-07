@@ -4,7 +4,7 @@ namespace Aardling\Concerts\Domain;
 
 use Aardling\Concerts\DomainEvent;
 
-class ConcertPlanned implements DomainEvent
+final class ConcertPlanned implements DomainEvent
 {
     private string $concertId;
     private int $capacity;

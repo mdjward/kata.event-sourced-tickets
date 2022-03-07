@@ -4,6 +4,6 @@ namespace Aardling\Concerts\Domain;
 
 use Exception;
 
-class NoTicketsAvailableAnymore extends Exception
+final class NoTicketsAvailableAnymore extends Exception
 {
 }

@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  * @todo : these tests are intentionally left superficial, naive and incomplete
  * it just serves as a starting point for adding more tests if that would help you
  */
-class BuyTicketsHandlerTest extends TestCase
+final class BuyTicketsHandlerTest extends TestCase
 {
     private $handler;
     private $eventstore;

@@ -6,7 +6,7 @@ namespace Aardling\Concerts\Infrastructure;
  * this is a very naive implementation
  * but it is sufficient as an example and for some (isolated, naive) unit testing of command handlers and aggregates
  */
-class DummyRecordingEventStore implements EventStore
+final class DummyRecordingEventStore implements EventStore
 {
     private array $pastEvents = [];
     private array $newEvents = [];

@@ -4,7 +4,7 @@ namespace Aardling\Concerts\Domain;
 
 use Aardling\Concerts\Command;
 
-class BuyTickets implements Command
+final class BuyTickets implements Command
 {
     private string $concertId;
     private string $customerId;
