@@ -34,11 +34,17 @@ final class SalesForConcert
         if ($event instanceof ConcertPlanned) {
             $this->id = $event->getConcertId();
             $this->capacity = $event->getCapacity();
+        } else if ($event instanceof TicketsSold) {
+            $this->capacity -= $event->getQuantity();
         }
     }
 
     public function buyTickets(string $customerId, int $quantity): void
     {
+        if ($quantity > $this->capacity) {
+            throw new NoTicketsAvailableAnymore();
+        }
+
         $this->recordedEvents[] = new TicketsSold($this->id, $customerId, $quantity);
     }
 

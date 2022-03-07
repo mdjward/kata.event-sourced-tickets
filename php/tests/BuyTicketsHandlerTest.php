@@ -8,6 +8,7 @@ use Aardling\Concerts\Domain\BuyTicketsHandler;
 use Aardling\Concerts\Domain\NoTicketsAvailableAnymore;
 use Aardling\Concerts\Domain\TicketsSold;
 use Aardling\Concerts\Infrastructure\DummyRecordingEventStore;
+use Aardling\Concerts\Infrastructure\EventStore;
 use PHPUnit\Framework\TestCase;
 
 /*
@@ -16,8 +17,10 @@ use PHPUnit\Framework\TestCase;
  */
 final class BuyTicketsHandlerTest extends TestCase
 {
-    private $handler;
-    private $eventstore;
+    private BuyTicketsHandler $handler;
+
+    private EventStore $eventstore;
+
     private Command $command;
 
     protected function setUp(): void
