@@ -42,6 +42,8 @@ final class SalesForConcert
             $this->capacity = $event->capacity;
         } else if ($event instanceof TicketsSold) {
             $this->capacity -= $event->quantity;
+        } else if ($event instanceof ConcertCapacityIncreased) {
+            $this->capacity += $event->additionalCapacity;
         }
     }
 
@@ -54,11 +56,19 @@ final class SalesForConcert
         $this->record(new TicketsSold($this->id, $customerId, $quantity));
     }
 
+    public function increaseCapacity(int $additionalCapacity): void
+    {
+        $this->record(new ConcertCapacityIncreased($this->id, $additionalCapacity));
+    }
+
     /**
      * @return DomainEvent[]
      */
-    public function getRecordedChanges(): array
+    public function popRecordedChanges(): array
     {
-        return $this->recordedEvents;
+        $recordedEvents = $this->recordedEvents;
+        $this->recordedEvents = [];
+
+        return $recordedEvents;
     }
 }

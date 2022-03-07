@@ -2,10 +2,12 @@
 
 namespace Aardling\Concerts;
 
+use Aardling\Concerts\Domain\ConcertCapacityIncreased;
 use Aardling\Concerts\Domain\ConcertPlanned;
 use Aardling\Concerts\Domain\BuyTickets;
 use Aardling\Concerts\Domain\BuyTicketsHandler;
 use Aardling\Concerts\Domain\IncreaseConcertCapacity;
+use Aardling\Concerts\Domain\IncreaseConcertCapacityHandler;
 use Aardling\Concerts\Domain\NoTicketsAvailableAnymore;
 use Aardling\Concerts\Domain\TicketsSold;
 use Aardling\Concerts\Infrastructure\DummyRecordingEventStore;
@@ -18,18 +20,40 @@ use PHPUnit\Framework\TestCase;
  */
 final class BuyTicketsHandlerTest extends TestCase
 {
-    private BuyTicketsHandler $handler;
+    /**
+     * @var \Closure(Command ...$commands): void
+     */
+    private \Closure $handler;
 
     private EventStore $eventstore;
 
-    private Command $command;
+    /**
+     * @var Command[]
+     */
+    private array $commands;
 
     protected function setUp(): void
     {
         parent::setUp();
 
+
         $this->eventstore = new DummyRecordingEventStore();
-        $this->handler = new BuyTicketsHandler($this->eventstore);
+
+        /** @var array<class-string<Command>, callable(Command): void> $handlers */
+        $handlers = [
+            BuyTickets::class => new BuyTicketsHandler($this->eventstore),
+            IncreaseConcertCapacity::class => new IncreaseConcertCapacityHandler($this->eventstore),
+        ];
+
+        $this->handler = function (Command ...$commands) use ($handlers) {
+            foreach ($commands as $command) {
+                \assert(isset($handlers[$command::class]));
+
+                ($handlers[$command::class])($command);
+            }
+        };
+
+        $this->commands = [];
     }
 
     /**
@@ -95,10 +119,12 @@ final class BuyTicketsHandlerTest extends TestCase
         $customerId = 'customer-1';
 
         $this->given(new ConcertPlanned($concertId, 5));
-        $this->when(new IncreaseConcertCapacity($concertId, 5));
-        $this->when(new BuyTickets($concertId, $customerId, 1));
+        $this->when(
+            new IncreaseConcertCapacity($concertId, 5),
+            new BuyTickets($concertId, $customerId, 10),
+        );
         $this->then([
-            new ConcertCapacityIncreased($concertId, $customerId, 5),
+            new ConcertCapacityIncreased($concertId, 5),
             new TicketsSold($concertId, $customerId, 10),
         ]);
     }
@@ -108,20 +134,20 @@ final class BuyTicketsHandlerTest extends TestCase
         $this->eventstore->appendExistingEventsToStream($event->streamId(), [$event]);
     }
 
-    private function when(Command $command): void
+    private function when(Command ...$commands): void
     {
-        $this->command = $command;
+        $this->commands = $commands;
     }
 
     private function then(array $events): void
     {
-        ($this->handler)($this->command);
+        ($this->handler)(...$this->commands);
         $this->assertEquals($events, $this->eventstore->getNewEvents());
     }
 
     private function exception(string $expectedException)
     {
         $this->expectException($expectedException);
-        ($this->handler)($this->command);
+        ($this->handler)(...$this->commands);
     }
 }
