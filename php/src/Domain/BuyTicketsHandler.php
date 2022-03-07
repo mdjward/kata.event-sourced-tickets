@@ -9,22 +9,16 @@ use Aardling\Concerts\Infrastructure\EventStore;
  */
 final class BuyTicketsHandler
 {
-    private EventStore $eventStore;
-
-    /**
-     * @param EventStore $eventStore
-     */
-    public function __construct(EventStore $eventStore)
+    public function __construct(private readonly EventStore $eventStore)
     {
-        $this->eventStore = $eventStore;
     }
 
-    public function handle(BuyTickets $command)
+    public function __invoke(BuyTickets $command): void
     {
-        $streamId = $command->getConcertId();
+        $streamId = $command->concertId;
 
         $salesForConcert = SalesForConcert::buildFromHistory($this->eventStore->findEventsByStreamId($streamId));
-        $salesForConcert->buyTickets($command->getCustomerId(), $command->getQuantity());
+        $salesForConcert->buyTickets($command->customerId, $command->quantity);
 
         $this->eventStore->appendEventsToStream($streamId, $salesForConcert->getRecordedChanges());
     }

@@ -38,10 +38,10 @@ final class SalesForConcert
     private function apply(DomainEvent $event): void
     {
         if ($event instanceof ConcertPlanned) {
-            $this->id = $event->getConcertId();
-            $this->capacity = $event->getCapacity();
+            $this->id = $event->concertId;
+            $this->capacity = $event->capacity;
         } else if ($event instanceof TicketsSold) {
-            $this->capacity -= $event->getQuantity();
+            $this->capacity -= $event->quantity;
         }
     }
 

@@ -26,6 +26,7 @@ final class BuyTicketsHandlerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->eventstore = new DummyRecordingEventStore();
         $this->handler = new BuyTicketsHandler($this->eventstore);
     }
@@ -84,17 +85,9 @@ final class BuyTicketsHandlerTest extends TestCase
         $this->exception(NoTicketsAvailableAnymore::class);
     }
 
-
-
-
-
-    /*
-     * Test framework code that could be extracted
-     */
-
     private function given(DomainEvent $event): void
     {
-        $this->eventstore->appendExistingEventsToStream($event->getStreamId(), [$event]);
+        $this->eventstore->appendExistingEventsToStream($event->streamId(), [$event]);
     }
 
     private function when(Command $command): void
@@ -104,13 +97,13 @@ final class BuyTicketsHandlerTest extends TestCase
 
     private function then(array $events): void
     {
-        $this->handler->handle($this->command);
+        ($this->handler)($this->command);
         $this->assertEquals($events, $this->eventstore->getNewEvents());
     }
 
     private function exception(string $expectedException)
     {
         $this->expectException($expectedException);
-        $this->handler->handle($this->command);
+        ($this->handler)($this->command);
     }
 }
