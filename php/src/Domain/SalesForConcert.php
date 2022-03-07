@@ -29,6 +29,12 @@ final class SalesForConcert
         return $instance;
     }
 
+    private function record(DomainEvent $event): void
+    {
+        $this->recordedEvents[] = $event;
+        $this->apply($event);
+    }
+
     private function apply(DomainEvent $event): void
     {
         if ($event instanceof ConcertPlanned) {
@@ -45,7 +51,7 @@ final class SalesForConcert
             throw new NoTicketsAvailableAnymore();
         }
 
-        $this->recordedEvents[] = new TicketsSold($this->id, $customerId, $quantity);
+        $this->record(new TicketsSold($this->id, $customerId, $quantity));
     }
 
     /**
