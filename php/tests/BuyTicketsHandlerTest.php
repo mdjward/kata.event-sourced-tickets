@@ -5,6 +5,7 @@ namespace Aardling\Concerts;
 use Aardling\Concerts\Domain\ConcertPlanned;
 use Aardling\Concerts\Domain\BuyTickets;
 use Aardling\Concerts\Domain\BuyTicketsHandler;
+use Aardling\Concerts\Domain\IncreaseConcertCapacity;
 use Aardling\Concerts\Domain\NoTicketsAvailableAnymore;
 use Aardling\Concerts\Domain\TicketsSold;
 use Aardling\Concerts\Infrastructure\DummyRecordingEventStore;
@@ -34,7 +35,7 @@ final class BuyTicketsHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_will_allow_to_reserve_the_only_ticket_available_if_it_wasnt_sold_yet()
+    public function it_will_allow_to_reserve_the_only_ticket_available_if_it_wasnt_sold_yet(): void
     {
         $concertId = 'concert-123';
         $customerId = 'customer-1';
@@ -47,7 +48,7 @@ final class BuyTicketsHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_will_disallow_ticket_sales_when_the_concert_doesnt_have_initial_capacity()
+    public function it_will_disallow_ticket_sales_when_the_concert_doesnt_have_initial_capacity(): void
     {
         $concertId = 'concert-123';
         $customerId = 'customer-1';
@@ -60,7 +61,7 @@ final class BuyTicketsHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_will_disallow_ticket_sales_for_more_than_the_capacity()
+    public function it_will_disallow_ticket_sales_for_more_than_the_capacity(): void
     {
         $concertId = 'concert-123';
         $customerId = 'customer-1';
@@ -73,7 +74,7 @@ final class BuyTicketsHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_will_take_already_sold_tickets_into_account()
+    public function it_will_take_already_sold_tickets_into_account(): void
     {
         $concertId = 'concert-123';
         $customerId = 'customer-1';
@@ -83,6 +84,23 @@ final class BuyTicketsHandlerTest extends TestCase
         $this->given(new TicketsSold($concertId, $otherCustomerId, 10));
         $this->when(new BuyTickets($concertId, $customerId, 1));
         $this->exception(NoTicketsAvailableAnymore::class);
+    }
+
+    /**
+     * @test
+     */
+    public function it_will_support_a_capacity_increase(): void
+    {
+        $concertId = 'concert-123';
+        $customerId = 'customer-1';
+
+        $this->given(new ConcertPlanned($concertId, 5));
+        $this->when(new IncreaseConcertCapacity($concertId, 5));
+        $this->when(new BuyTickets($concertId, $customerId, 1));
+        $this->then([
+            new ConcertCapacityIncreased($concertId, $customerId, 5),
+            new TicketsSold($concertId, $customerId, 10),
+        ]);
     }
 
     private function given(DomainEvent $event): void
